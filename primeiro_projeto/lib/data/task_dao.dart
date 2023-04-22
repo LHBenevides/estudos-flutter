@@ -10,10 +10,33 @@ class TaskDao {
 
   static const String _tablename = 'tasktable';
   static const String _name = 'name';
-  static const String _difficulty = '_difficulty';
+  static const String _difficulty = 'difficulty';
   static const String _image = 'image';
 
-  save(TaskCard tarefa) async {}
+  save(TaskCard tarefa) async {
+    print('save');
+    final Database database = await getDataBase();
+    var itemExists = await find(tarefa.nome);
+    Map<String, dynamic> taskMap = toMap(tarefa);
+    if (itemExists.isEmpty) {
+      print('Tarefa não existe');
+      return await database.insert(_tablename, taskMap);
+    } else {
+      print('Tarefa ja existe');
+      return await database.update(_tablename, taskMap,
+          where: '$_name = ?', whereArgs: [tarefa.nome]);
+    }
+  }
+
+  Map<String, dynamic> toMap(TaskCard tarefa) {
+    print('toMap on');
+    final Map<String, dynamic> mapaDeTarefas = {};
+    mapaDeTarefas[_name] = tarefa.nome;
+    mapaDeTarefas[_difficulty] = tarefa.dificuldade;
+    mapaDeTarefas[_image] = tarefa.foto;
+    print(mapaDeTarefas);
+    return mapaDeTarefas;
+  }
 
   Future<List<TaskCard>> findAll() async {
     print('acessando FindAll');
