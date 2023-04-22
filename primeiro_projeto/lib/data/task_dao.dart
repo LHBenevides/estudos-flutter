@@ -38,7 +38,17 @@ class TaskDao {
     return tarefas;
   }
 
-  Future<List<TaskCard>> find(String momeDaTarefa) async {}
+  Future<List<TaskCard>> find(String nomeDaTarefa) async {
+    print('Find');
+    final Database database = await getDataBase();
+    final List<Map<String, dynamic>> result = await database.query(
+      _tablename,
+      where: '$_name = ?',
+      whereArgs: [nomeDaTarefa],
+    );
+    print(result);
+    return toList(result);
+  }
 
   delete(String nomeDaTarefa) async {}
 }
