@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:primeiro_projeto/data/task_inherited.dart';
+import 'package:primeiro_projeto/components/task.dart';
+import 'package:primeiro_projeto/data/task_dao.dart';
 
 class FormScreen extends StatefulWidget {
   const FormScreen({Key? key, required this.taskContext}) : super(key: key);
@@ -26,7 +27,7 @@ class _FormScreenState extends State<FormScreen> {
 
   bool difficultyValidator(String? value) {
     if (value != null && value.isEmpty) {
-      if (value!.isEmpty || int.parse(value) > 5 || int.parse(value) < 1) {
+      if (value.isEmpty || int.parse(value) > 5 || int.parse(value) < 1) {
         return true;
       }
     }
@@ -138,10 +139,17 @@ class _FormScreenState extends State<FormScreen> {
                   ElevatedButton(
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        TaskInherited.of(widget.taskContext).newTask(
-                            nameController.text,
-                            int.parse(difficultyController.text),
-                            imageController.text);
+                        TaskDao().save(TaskCard(
+                          nameController.text,
+                          int.parse(difficultyController.text),
+                          foto: imageController.text,
+                        ));
+
+                        // TaskInherited.of(widget.taskContext).newTask(
+                        //     nameController.text,
+                        //     int.parse(difficultyController.text),
+                        //     imageController.text);
+
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
                                 content: Text('Criado Nova Tarefa!')));
