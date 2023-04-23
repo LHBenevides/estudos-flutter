@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:primeiro_projeto/components/difficulty.dart';
+import 'package:primeiro_projeto/data/task_dao.dart';
 
 class TaskCard extends StatefulWidget {
   final String nome;
@@ -20,7 +21,6 @@ class TaskCard extends StatefulWidget {
 }
 
 class _TaskCardState extends State<TaskCard> {
-
   int maxLevel = 5;
   int colorLevel = 0;
 
@@ -124,6 +124,9 @@ class _TaskCardState extends State<TaskCard> {
                         height: 52,
                         width: 52,
                         child: ElevatedButton(
+                            onLongPress: () {
+                              TaskDao().delete(widget.nome);
+                            },
                             onPressed: () {
                               setState(() {
                                 incrementLevel();
