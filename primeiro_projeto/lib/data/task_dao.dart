@@ -1,77 +1,85 @@
 import 'package:primeiro_projeto/components/task.dart';
-import 'package:primeiro_projeto/database.dart';
+import 'package:primeiro_projeto/data/database.dart';
 import 'package:sqflite/sqflite.dart';
 
 class TaskDao {
   static const String tableSql = 'CREATE TABLE $_tablename('
       '$_name TEXT, '
       '$_difficulty INTEGER, '
-      '$_image TEXT,)';
+      '$_image TEXT)';
 
-  static const String _tablename = 'tasktable';
+  static const String _tablename = 'taskTable';
   static const String _name = 'name';
   static const String _difficulty = 'difficulty';
   static const String _image = 'image';
 
   save(TaskCard tarefa) async {
-    print('save');
-    final Database database = await getDataBase();
+    print('Iniciando o save: ');
+    final Database bancoDeDados = await getDatabase();
     var itemExists = await find(tarefa.nome);
     Map<String, dynamic> taskMap = toMap(tarefa);
     if (itemExists.isEmpty) {
-      print('Tarefa não existe');
-      return await database.insert(_tablename, taskMap);
+      print('a Tarefa não Existia.');
+      return await bancoDeDados.insert(_tablename, taskMap);
     } else {
-      print('Tarefa ja existe');
-      return await database.update(_tablename, taskMap,
-          where: '$_name = ?', whereArgs: [tarefa.nome]);
+      print('a Tarefa existia!');
+      return await bancoDeDados.update(
+        _tablename,
+        taskMap,
+        where: '$_name = ?',
+        whereArgs: [tarefa.nome],
+      );
     }
   }
 
   Map<String, dynamic> toMap(TaskCard tarefa) {
-    print('toMap on');
+    print('Convertendo to Map: ');
     final Map<String, dynamic> mapaDeTarefas = {};
     mapaDeTarefas[_name] = tarefa.nome;
     mapaDeTarefas[_difficulty] = tarefa.dificuldade;
     mapaDeTarefas[_image] = tarefa.foto;
-    print(mapaDeTarefas);
+    print('Mapa de Tarefas: $mapaDeTarefas');
     return mapaDeTarefas;
   }
 
   Future<List<TaskCard>> findAll() async {
-    print('acessando FindAll');
-    final Database database = await getDataBase();
-    final List<Map<String, dynamic>> result = await database.query(_tablename);
-    print(result);
+    print('Acessando o findAll: ');
+    final Database bancoDeDados = await getDatabase();
+    final List<Map<String, dynamic>> result =
+    await bancoDeDados.query(_tablename);
+    print('Procurando dados no banco de dados... encontrado: $result');
     return toList(result);
   }
 
   List<TaskCard> toList(List<Map<String, dynamic>> mapaDeTarefas) {
-    print('toList on');
+    print('Convertendo to List:');
     final List<TaskCard> tarefas = [];
     for (Map<String, dynamic> linha in mapaDeTarefas) {
-      final TaskCard tarefa = TaskCard(
-        linha[_name],
-        linha[_difficulty],
-        foto: linha[_image],
-      );
+      final TaskCard tarefa = TaskCard(linha[_name], linha[_difficulty], foto: linha[_image],);
       tarefas.add(tarefa);
     }
-    print(tarefas);
+    print('Lista de Tarefas: ${tarefas.toString()}');
     return tarefas;
   }
 
   Future<List<TaskCard>> find(String nomeDaTarefa) async {
-    print('Find');
-    final Database database = await getDataBase();
-    final List<Map<String, dynamic>> result = await database.query(
+    print('Acessando find: ');
+    final Database bancoDeDados = await getDatabase();
+    print('Procurando tarefa com o nome: ${nomeDaTarefa}');
+    final List<Map<String, dynamic>> result = await bancoDeDados
+        .query(_tablename, where: '$_name = ?', whereArgs: [nomeDaTarefa]);
+    print('Tarefa encontrada: ${toList(result)}');
+
+    return toList(result);
+  }
+
+  delete(String nomeDaTarefa) async {
+    print('Deletando tarefa: $nomeDaTarefa');
+    final Database bancoDeDados = await getDatabase();
+    return await bancoDeDados.delete(
       _tablename,
       where: '$_name = ?',
       whereArgs: [nomeDaTarefa],
     );
-    print(result);
-    return toList(result);
   }
-
-  delete(String nomeDaTarefa) async {}
 }
