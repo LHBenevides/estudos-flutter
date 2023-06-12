@@ -35,7 +35,7 @@ README.md
 pubspec.lock
 db.json
 /server
-lib/services/
+lib/services/webclient.dart
 # Web related
 lib/generated_plugin_registrant.dart
 
